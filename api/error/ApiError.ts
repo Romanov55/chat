@@ -11,7 +11,6 @@ class ApiError {
         return new ApiError(404, message)
     }
 
-
     static unauthorized(message: string) {
         return new ApiError(401, message);
     }

@@ -1,48 +1,37 @@
 'use client'
 
-import { useState, useEffect } from "react";
-import { useStore } from "@/store/chatStore";
-import socket from "./socket";
+import { useChat } from "@/hooks/useChat";
+import { useState } from "react";
 
-export default function Chat() {
-    const [message, setMessage] = useState("");
-    const messages = useStore((state) => state.messages);
-    const setMessages = useStore((state) => state.setMessages);
+export default function Chat({ userId, receiverId, oldMessages }: { userId: string; receiverId: string, oldMessages: [] }) {
+    const { messages, sendMessage } = useChat(userId);
+    const [text, setText] = useState("");
 
-    useEffect(() => {
-        const handleMessage = (msg) => {
-            setMessages((prevMessages) => [...prevMessages, msg]);
-        };
-    
-        socket.on("message", handleMessage);
-    
-        return () => {
-            socket.off("message", handleMessage);
-        };
-    }, [setMessages]);
-    
-
-    const sendMessage = () => {
-        if (message.trim()) {
-            const msg = { text: message, createdAt: new Date() };
-            socket.emit("message", msg);
-            setMessage("");
+    const handleSend = () => {
+        if (text.trim()) {
+            sendMessage(receiverId, text);
+            setText("");
         }
     };
-    
+
     return (
-        <div className="p-4 max-w-lg mx-auto">
-            <div className="border rounded-lg p-4 h-80 overflow-y-auto bg-gray-100">
-                {messages && messages.map((msg, index) => (
-                    <div key={index} className="mb-2 p-2 bg-white rounded-lg shadow">
-                        {msg.text}
+        <div>
+            <h2>Чат с пользователем {receiverId}</h2>
+            <div style={{ border: "1px solid #ccc", padding: 10, height: 300, overflowY: "scroll" }}>
+                {oldMessages.map((msg, index) => (
+                    <div key={index} style={{ marginBottom: 10 }}>
+                        <div>{msg.sender} {userId}</div>
+                        <strong>{msg.sender === userId ? "Вы" : "Собеседник"}:</strong> {msg.text}
+                    </div>
+                ))}
+                {messages.map((msg, index) => (
+                    <div key={index} style={{ marginBottom: 10 }}>
+                        <strong>{msg.sender === userId ? "Вы" : "Собеседник"}:</strong> {msg.text}
                     </div>
                 ))}
             </div>
-            <div className="mt-4 flex gap-2">
-                <input value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Введите сообщение..." />
-                <button onClick={sendMessage}>Отправить</button>
-            </div>
+            <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Введите сообщение..." />
+            <button onClick={handleSend}>Отправить</button>
         </div>
     );
 }

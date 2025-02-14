@@ -5,28 +5,27 @@ import fileUpload from 'express-fileupload';
 import router from './routes/index';
 import connectDB from './db';
 import errorHandler from './middleware/errorHandingMiddleware';
+import http from "http";
+import { initSocket } from './socket';
 
 dotenv.config();
 connectDB();
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 4000;
 
 const app = express();
+const httpServer = http.createServer(app);
+
 app.use(cors());
 app.use(express.json());
 app.use(fileUpload({}));
 app.use('/api', router);
 app.use('/img', express.static('static'));
 
-// Обработка ошибок, послендий Middleware
-app.use(errorHandler)
+// Обработка ошибок, последний Middleware
+app.use(errorHandler);
 
-const start = async () => {
-    try {
-        app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
-    } catch (e) {
-        console.error('Server error:', e);
-    }
-};
+// Инициализируем WebSocket
+initSocket(httpServer);
 
-start();
+httpServer.listen(PORT, () => console.log(`🚀 Server started on port ${PORT}`));
