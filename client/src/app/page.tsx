@@ -3,8 +3,9 @@ import { SignOut } from "@/components/sign-out";
 import UserAvatar from "@/components/userAvatar";
 import { auth } from "../auth"
 import axios from "axios";
+import { Contacts } from "@/components/contacts";
 
-export default async function ChatPage() {
+export default async function MainPage() {
     const session = await auth()
     if (!session?.user) return null
 
@@ -15,6 +16,7 @@ export default async function ChatPage() {
         <div >
             <UserAvatar />
             <SignOut />
+            <Contacts />
             <Chat userId={'67af24c99ff781d79c184f06'} receiverId={'67af3ab82f84e5236268fbb3'} oldMessages={oldMessages} />
         </div>
     );
