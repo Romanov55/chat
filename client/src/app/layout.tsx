@@ -1,8 +1,10 @@
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { auth } from "../auth"
 import axios from "axios";
+import { cookies } from "next/headers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,7 +28,22 @@ export default async function  RootLayout({
   const session = await auth()
       
   if (session?.user) {
-    await axios.post("http://localhost:4000/api/user/registration", { email: session.user.email })
+    try {
+      const response = await axios.post("http://localhost:4000/api/user/registration", { 
+        email: session.user.email, 
+        name: session.user.name 
+      });
+
+      const userId = response.data?.data?._id;
+      const cookieStore = await cookies()
+      console.log(userId);
+
+      if (userId) {
+        cookieStore.set('name', 'lee')
+      }
+    } catch (error) {
+      console.error("Ошибка регистрации:", error);
+    } 
   }
 
   return (

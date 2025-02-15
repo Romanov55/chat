@@ -9,15 +9,24 @@ export default new class UserController {
   // Регистрация пользователя
   async registration(req: Request, res: Response, next: NextFunction) {
     try {
-        const { email } = req.body;
-        
-        // Проверка на null или undefined перед выполнением запроса
-        const existingUser = await User.findOne({ $or: [{ email: email || "" }] });
-        if (existingUser) {
-          return res.json({ message: 'Пользователь с таким email уже зарегистрирован' });
+        const { email, name } = req.body;
+
+        if (!email) {
+          return res.json({ message: 'Email обязателен' });
         }
 
-        const newUser = new User({ email });
+        // Проверка на null или undefined перед выполнением запроса
+        const existingUser = email ? await User.findOne({ email }) : null;
+        if (existingUser && existingUser.name !== name) {
+          existingUser.name = name;
+          await existingUser.save();
+        }
+        
+        if (existingUser) {
+          return res.json({ message: 'Пользователь с таким email уже зарегистрирован', data: existingUser.id });
+        }
+
+        const newUser = new User({ email, name });
         await newUser.save();
 
         return res.json({ message: 'Пользователь зарегистрирован', data: newUser });
