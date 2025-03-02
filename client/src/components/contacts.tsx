@@ -1,27 +1,36 @@
-import Image from 'next/image';
-import React from 'react';
+/* eslint-disable @next/next/no-img-element */
+'use client'
 
-interface Props {
-    contacts?: Contacts[];
-}
+import { useState } from 'react';
+import Chat from './chat';
+import { UserType } from '@/app/types';
 
-interface Contacts {
-    id: string;
-    name: string;
-    avatar: string;
-    lastMessage: string;
-}
+export const Contacts = ({userInfo} : {userInfo: UserType}) => {
+    const [activeChat, setActiveChat] = useState(false);
+    const [activeContact, setActiveContact] = useState('');
 
-export const Contacts: React.FC<Props> = ({contacts}) => {
+    const openChat = () => {
+        setActiveChat(true);
+    };
+
+    const activateChat = (_id:string) => {
+        if (!activeChat) {
+            openChat();
+        }
+
+        setActiveContact(_id);
+    };
+
     return (
         <div className='contacts'>
-            {contacts?.map((contact) => (
-                <div key={contact.id}>
-                    <Image width={50} height={50} src={contact.avatar} alt="Contact Avatar" />
+            {userInfo.friends && userInfo.friends?.map((contact: UserType) => (
+                <div key={contact._id} onClick={() => activateChat(contact._id)}>
+                    <img  src={contact.avatar || ""} alt={`Аватар ${contact.name}`} />
                     <div>{contact.name}</div>
                     <div>{contact.lastMessage}</div>
                 </div>
             ))}
+            {activeChat && <Chat userId={userInfo._id} receiverId={activeContact} />}
         </div>
     );
 };

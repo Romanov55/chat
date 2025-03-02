@@ -1,23 +1,20 @@
-import Chat from "@/components/chat";
 import { SignOut } from "@/components/sign-out";
 import UserAvatar from "@/components/userAvatar";
 import { auth } from "../auth"
-import axios from "axios";
 import { Contacts } from "@/components/contacts";
+import { authUser } from "./actions/user";
 
 export default async function MainPage() {
     const session = await auth()
     if (!session?.user) return null
 
-    const response = await axios.get(`http://localhost:4000/api/message?sender=67af24c99ff781d79c184f06&receiver=67af3ab82f84e5236268fbb3`);
-    const oldMessages = response.data;
-    
+    const userInfo = await authUser(session.user)
+
     return (
         <div >
-            <UserAvatar />
+            <UserAvatar session={session} />
             <SignOut />
-            <Contacts />
-            <Chat userId={'67af24c99ff781d79c184f06'} receiverId={'67af3ab82f84e5236268fbb3'} oldMessages={oldMessages} />
+            <Contacts userInfo={userInfo}/>
         </div>
     );
 }

@@ -1,3 +1,4 @@
+import { MessageType } from "@/app/types";
 import { useState, useEffect } from "react";
 import { io, Socket } from "socket.io-client";
 
@@ -6,7 +7,7 @@ const SERVER_URL = "http://localhost:4000";
 
 export function useChat(userId: string) {
     const [socket, setSocket] = useState<Socket | null>(null);
-    const [messages, setMessages] = useState<any[]>([]);
+    const [messages, setMessages] = useState<MessageType[]>([]);
 
     useEffect(() => {
         if (!userId) return;
