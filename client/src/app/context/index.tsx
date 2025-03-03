@@ -1,11 +1,15 @@
 import { create } from 'zustand'
 
 type Store = {
-  userId: string
-  setUserId: (id: string) => void
+  isActiveChat: boolean;
+  setActiveChat: (e: boolean) => void;
+  receiverId: string;
+  setReceiverId: (e: string) => void;
 }
 
 export const useStore = create<Store>()((set) => ({
-  userId: "",
-  setUserId: (id) => set({ userId: id }),
+  isActiveChat: false,
+  setActiveChat: (e) => set({ isActiveChat: e }),
+  receiverId: '',
+  setReceiverId: (e) => set({ receiverId: e }),
 })) 

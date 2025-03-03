@@ -1,6 +1,7 @@
 
 import type { Metadata } from "next";
 import "./globals.css";
+import "@/styles/styles.css";
 
 export const metadata: Metadata = {
   title: "Чат",
@@ -14,7 +15,9 @@ export default async function  RootLayout({
   return (
     <html lang="ru">
       <body>
-        {children}
+        <main>
+          {children}
+        </main>
       </body>
     </html>
   );

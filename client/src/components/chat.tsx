@@ -1,19 +1,25 @@
 'use client'
 
 import { getMessages } from "@/app/actions/messages";
+import { useStore } from "@/app/context";
 import { MessageType } from "@/app/types";
 import { useChat } from "@/hooks/useChat";
 import { useEffect, useState, useCallback, useRef } from "react";
 
-export default function Chat({ userId, receiverId }: { userId: string; receiverId: string }) {
+export default function Chat({ userId }: { userId: string }) {
+    const { receiverId } = useStore();
     const { messages, sendMessage } = useChat(userId);
     const [oldMessages, setOldMessages] = useState<MessageType[]>([]);
     const [text, setText] = useState("");
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const chatContainerRef = useRef<HTMLDivElement>(null);
-
+    
     useEffect(() => {
+        if (receiverId === '') {
+            return
+        }
+        
         const getAllMessages = async (sender: string, receiver: string) => {
             setIsLoading(true);
             try {
@@ -57,11 +63,15 @@ export default function Chat({ userId, receiverId }: { userId: string; receiverI
         return (b.timestamp instanceof Date ? b.timestamp.getTime() : b.timestamp) - 
                (a.timestamp instanceof Date ? a.timestamp.getTime() : a.timestamp);
     });
-    
+
+    if (receiverId === "") {
+        return
+    }
+
     return (
-        <div>
+        <div className="chat">
             <h2>Чат с пользователем {receiverId}</h2>
-            <div ref={chatContainerRef} style={{ border: "1px solid #ccc", padding: 10, height: 300, overflowY: "scroll" }}>
+            <div className="chat__field" ref={chatContainerRef}>
                 {isLoading && <p>Загрузка...</p>}
                 {error && <p style={{ color: "red" }}>{error}</p>}
 
